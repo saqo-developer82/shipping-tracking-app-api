@@ -8,6 +8,8 @@ use App\Models\Tracking;
 
 class TrackingApiTest extends TestCase
 {
+    const BASE_URL = '/api/track';
+
     use RefreshDatabase;
 
     public function test_can_track_existing_package()
@@ -19,7 +21,7 @@ class TrackingApiTest extends TestCase
             'carrier' => 'Test Carrier'
         ]);
 
-        $response = $this->postJson('/api/v1/track', [
+        $response = $this->postJson(self::BASE_URL, [
             'tracking_code' => 'TEST123456789'
         ]);
 
@@ -35,7 +37,7 @@ class TrackingApiTest extends TestCase
 
     public function test_returns_404_for_non_existent_tracking_code()
     {
-        $response = $this->postJson('/api/v1/track', [
+        $response = $this->postJson(self::BASE_URL, [
             'tracking_code' => 'NONEXISTENT'
         ]);
 
@@ -48,7 +50,7 @@ class TrackingApiTest extends TestCase
 
     public function test_validates_tracking_code_format()
     {
-        $response = $this->postJson('/api/v1/track', [
+        $response = $this->postJson(self::BASE_URL, [
             'tracking_code' => 'short'
         ]);
 

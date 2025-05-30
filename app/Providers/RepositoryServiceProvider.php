@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Services\Contracts\TrackingRepositoryInterface;
-use App\Repositories\SqliteTrackingRepository;
+use App\Repositories\Contracts\TrackingRepositoryInterface;
 use App\Repositories\CsvTrackingRepository;
+use App\Repositories\SqliteTrackingRepository;
+use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
 {

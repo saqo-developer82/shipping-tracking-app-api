@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Services\Contracts\TrackingRepositoryInterface;
+use App\Repositories\Contracts\TrackingRepositoryInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -15,6 +15,18 @@ class TrackingService
         $this->repository = $repository;
     }
 
+    /**
+     * Retrieves tracking information for the given tracking code.
+     *
+     * This method attempts to fetch tracking details using a cache mechanism.
+     * If the data is not found in the cache, it queries the repository
+     * and stores the result in the cache for future lookups.
+     *
+     * Logs are generated to indicate the success or failure of the lookup operation.
+     *
+     * @param string $trackingCode The unique code used to identify the tracking information.
+     * @return array|null The tracking information, or null if not found.
+     */
     public function getTrackingInfo(string $trackingCode): ?array
     {
         $cacheKey = "tracking_{$trackingCode}";

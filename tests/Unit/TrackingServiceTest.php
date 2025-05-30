@@ -2,10 +2,9 @@
 
 namespace Tests\Unit;
 
+use App\Repositories\Contracts\TrackingRepositoryInterface;
 use Tests\TestCase;
 use App\Services\TrackingService;
-use App\Contracts\TrackingRepositoryInterface;
-use App\DTOs\TrackingInfoDto;
 use Carbon\Carbon;
 use Mockery;
 use Illuminate\Support\Facades\Cache;
@@ -33,31 +32,36 @@ class TrackingServiceTest extends TestCase
     {
         // Arrange
         $trackingCode = 'TRK123456789';
-        $expectedDto = new TrackingInfoDto(
-            trackingCode: $trackingCode,
-            estimatedDeliveryDate: Carbon::now()->addDays(3),
-            status: 'in_transit',
-            carrier: 'DHL',
-            destination: 'New York, NY'
-        );
+        $expectedData = [
+            'tracking_code' => 'TRK123456789',
+            'estimated_delivery_date' => Carbon::now()->addDays(3)->format('Y-m-d'),
+            'status' => 'In Transit',
+            'carrier' => 'Test Carrier',
+            'origin' => 'New York, NY',
+            'destination' => 'Los Angeles, CA'
+        ];
 
         Cache::shouldReceive('remember')
             ->once()
-            ->andReturn($expectedDto);
+            ->andReturn($expectedData);
 
         // Act
         $result = $this->trackingService->getTrackingInfo($trackingCode);
 
         // Assert
         $this->assertNotNull($result);
-        $this->assertEquals($trackingCode, $result->trackingCode);
-        $this->assertEquals('in_transit', $result->status);
+        $this->assertEquals($trackingCode, $result['tracking_code']);
+        $this->assertEquals('In Transit', $result['status']);
     }
 
     public function test_get_tracking_info_returns_null_for_invalid_code(): void
     {
         // Arrange
         $invalidTrackingCode = 'invalid-code!@#';
+
+        $this->mockRepository->shouldReceive('findByTrackingCode')
+            ->with('invalid-code!@#') // or Mockery::any(), or Mockery::type('string')
+            ->andReturn(null);
 
         // Act
         $result = $this->trackingService->getTrackingInfo($invalidTrackingCode);
@@ -69,26 +73,27 @@ class TrackingServiceTest extends TestCase
     public function test_store_tracking_info_success(): void
     {
         // Arrange
-        $trackingInfo = new TrackingInfoDto(
-            trackingCode: 'TRK123456789',
-            estimatedDeliveryDate: Carbon::now()->addDays(3),
-            status: 'in_transit',
-            carrier: 'DHL',
-            destination: 'New York, NY'
-        );
+        $trackingData = [
+            'tracking_code' => 'TRK123456789',
+            'estimated_delivery_date' => Carbon::now()->addDays(3)->format('Y-m-d'),
+            'status' => 'In Transit',
+            'carrier' => 'Test Carrier',
+            'origin' => 'New York, NY',
+            'destination' => 'Los Angeles, CA'
+        ];
 
         $this->mockRepository
-            ->shouldReceive('store')
+            ->shouldReceive('createTrackingEntry')
             ->once()
-            ->with($trackingInfo)
+            ->with($trackingData)
             ->andReturn(true);
 
         Cache::shouldReceive('forget')
             ->once()
-            ->with('tracking:TRK123456789');
+            ->with('tracking_TRK123456789');
 
         // Act
-        $result = $this->trackingService->storeTrackingInfo($trackingInfo);
+        $result = $this->trackingService->createTracking($trackingData);
 
         // Assert
         $this->assertTrue($result);

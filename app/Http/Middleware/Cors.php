@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class Cors
 {
+    /**
+     * Handle an incoming request by manipulating the response headers to define
+     * Cross-Origin Resource Sharing (CORS) policies.
+     *
+     * @param Request $request The incoming HTTP request.
+     * @param Closure $next The next middleware to be executed.
+     * @return mixed           The HTTP response with modified headers.
+     */
     public function handle(Request $request, Closure $next)
     {
         $response = $next($request);

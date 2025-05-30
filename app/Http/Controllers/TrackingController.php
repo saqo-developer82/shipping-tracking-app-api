@@ -15,6 +15,13 @@ class TrackingController extends Controller
         $this->trackingService = $trackingService;
     }
 
+    /**
+     * Handles the tracking process by fetching tracking information
+     * based on the provided tracking code in the request.
+     *
+     * @param TrackingRequest $request The request containing the tracking code.
+     * @return JsonResponse The response containing the tracking information or an error message.
+     */
     public function track(TrackingRequest $request): JsonResponse
     {
         $trackingCode = strtoupper(trim($request->input('tracking_code')));
@@ -33,15 +40,6 @@ class TrackingController extends Controller
             'success' => true,
             'message' => 'Tracking information retrieved successfully.',
             'data' => $trackingInfo
-        ]);
-    }
-
-    public function health(): JsonResponse
-    {
-        return response()->json([
-            'status' => 'healthy',
-            'timestamp' => now()->toISOString(),
-            'storage_driver' => config('tracking.storage_driver')
         ]);
     }
 }
