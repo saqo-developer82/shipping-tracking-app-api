@@ -37,8 +37,12 @@ class CsvTrackingRepository implements TrackingRepositoryInterface
         $lines = explode("\n", $csvContent);
 
         // Skip header row
-        for ($i = 1; $i < count($lines); $i++) {
-            $data = str_getcsv($lines[$i]);
+        foreach ($lines as $i => $line) {
+            if ($i === 0) {
+                continue;
+            }
+
+            $data = str_getcsv($line);
             if (count($data) >= 6 && $data[0] === $trackingCode) {
                 return [
                     'tracking_code' => $data[0],

@@ -39,6 +39,6 @@ class SqliteTrackingRepository implements TrackingRepositoryInterface
      */
     public function createTrackingEntry(array $data): bool
     {
-        return Tracking::create($data) ? true : false;
+        return (bool)Tracking::create($data);
     }
 }
